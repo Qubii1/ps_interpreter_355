@@ -1,7 +1,8 @@
 use super::dict::EnvRef;
 
 #[derive(Clone, Debug)]
-pub enum Value {
+pub enum Value
+{
     Int(i32),
     Real(f64),
     Bool(bool),

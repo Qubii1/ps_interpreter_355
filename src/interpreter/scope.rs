@@ -1,5 +1,6 @@
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum ScopeMode {
+pub enum ScopeMode
+{
     Dynamic,
     Lexical,
 }
