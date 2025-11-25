@@ -124,4 +124,8 @@ impl Interpreter
     {
         self.opstack.snapshot()
     }
+    pub fn len(&self) -> usize
+    {
+        self.opstack.len()
+    }
 }
