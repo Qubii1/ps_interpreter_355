@@ -1,18 +1,32 @@
+// -----------------------------------------------------------------------------
+// File: builtin.rs
+// Author: Quinn Bankhead
+// Project: PostScript Interpreter (CptS 355 - Mini Project)
+// Description:
+// Defines the different builtin methods that the interpreter should be
+// able to execute.
+// -----------------------------------------------------------------------------
+
 use super::value::Value;
 use super::exec::Interpreter;
 
 impl Interpreter
 {
+    // Method that runs built-in executions. 
     pub fn try_builtin(&mut self, name: &str) -> Result<bool, String>
     {
         match name
         {
+            // Adds two valid integer values.
             "add" =>
             {
+                // Pop the first value off the stack.
                 let b = self.pop()?;
 
+                // Pop the second value off the stack.
                 let a = self.pop()?;
 
+                // Push the result of adding a + b to the stack.
                 self.push(match (a, b)
                 {
                     (Value::Int(x), Value::Int(y)) => Value::Int(x + y),
@@ -22,12 +36,16 @@ impl Interpreter
                 Ok(true)
             }
 
+            // Subtracts two valid integer values.
             "sub" =>
             {
+                // Pop the first value off the stack.
                 let b = self.pop()?;
 
+                // Pop the second value off the top of stack.
                 let a = self.pop()?;
 
+                // Push the result of subtracting a - b to the stack.
                 self.push(match (a, b)
                 {
                     (Value::Int(x), Value::Int(y)) => Value::Int(x - y),
@@ -37,6 +55,7 @@ impl Interpreter
                 Ok(true)
             }
 
+            // Duplicates the top of the Operand Stack
             "dup" =>
             {
                 let top = self.peek().ok_or("Operand stack underflow")?.clone();
@@ -46,6 +65,7 @@ impl Interpreter
                 Ok(true)
             }
 
+            // Swaps the top two Values on the stack.
             "exch" =>
             {
                 let b = self.pop()?;
@@ -59,6 +79,7 @@ impl Interpreter
                 Ok(true)
             }
 
+            // Pops the top of the stack.
             "pop" =>
             {
                 self.pop()?;
@@ -66,24 +87,31 @@ impl Interpreter
                 Ok(true)
             }
 
+            // Adds a variable name and value to the dictionary.
             "def" =>
             {
+                // First get the value of the variable.
                 let value = self.pop()?;
 
+                // Then get the name associated with that value.
                 let name = self.pop()?;
+
 
                 if let Value::Name(n) = name
                 {
+                    // Name is a valid variable name.
+                    // Add it to the dictionary.
                     self.dict.define(&n, value);
 
                     Ok(true)
                 }
                 else
                 {
+                    // Variable name was invalid.
                     Err("def expects a literal name".to_string())
                 }
             }
-            
+
             _ => Ok(false),
         }
     }
