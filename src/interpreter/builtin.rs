@@ -7,6 +7,10 @@
 // able to execute.
 // -----------------------------------------------------------------------------
 
+use std::cell::RefCell;
+use std::rc::Rc;
+
+use super::scope::ScopeMode;
 use super::value::Value;
 use super::exec::Interpreter;
 
@@ -87,7 +91,6 @@ impl Interpreter
                 Ok(true)
             }
 
-            // Adds a variable name and value to the dictionary.
             "def" =>
             {
                 // First get the value of the variable.
@@ -96,12 +99,31 @@ impl Interpreter
                 // Then get the name associated with that value.
                 let name = self.pop()?;
 
-
                 if let Value::Name(n) = name
                 {
-                    // Name is a valid variable name.
-                    // Add it to the dictionary.
-                    self.dict.define(&n, value);
+                    match (&self.scope_mode, &value) 
+                    {
+                        // LEXICAL: capture the environment at definition time
+                        ( ScopeMode::Lexical, Value::Procedure(body, _) ) =>
+                        {
+                            // Clone dictionary stack (Vec<Dict>) at definition time
+                            let snapshot = self.dict.env().borrow().clone();
+
+                            let captured = Value::Procedure(
+                                body.clone(),
+                                Some(Rc::new(RefCell::new(snapshot)))
+                            );
+
+                            self.dict.define(&n, captured);
+                        }
+                        // DYNAMIC: store the procedure as-is (no captured env)
+                        _ =>
+                        {
+                            println!("DEBUG DEF: defining '{}' as {:?}", n, value);
+
+                            self.dict.define(&n, value);
+                        }
+                    }
 
                     Ok(true)
                 }

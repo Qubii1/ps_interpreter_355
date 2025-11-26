@@ -45,8 +45,15 @@ impl Interpreter
     pub fn interpret(&mut self, src: &str) -> InterpreterResult 
     {
         let tokens = tokenize(src)?;
-        self.exec_tokens(&tokens, None)
+        
+        let env = match self.scope_mode {
+            ScopeMode::Lexical => Some(self.dict.env()),
+            ScopeMode::Dynamic => None,
+        };
+
+        self.exec_tokens(&tokens, env)
     }
+
 
     // Executes the given input.
     pub fn exec_tokens(&mut self, tokens: &[Token], defining_env: Option<EnvRef>) -> InterpreterResult
