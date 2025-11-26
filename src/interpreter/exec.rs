@@ -46,8 +46,13 @@ impl Interpreter
     {
         let tokens = tokenize(src)?;
         
-        let env = match self.scope_mode {
+        let env = match self.scope_mode
+        {
+            // If the scope mode is lexical it needs to capture the current
+            // defined environment
             ScopeMode::Lexical => Some(self.dict.env()),
+
+            // Otherwise it will rely on the dictionary stack for dynamic scoping.
             ScopeMode::Dynamic => None,
         };
 
@@ -134,5 +139,9 @@ impl Interpreter
     pub fn len(&self) -> usize
     {
         self.opstack.len()
+    }
+    pub fn clear(&mut self)
+    {
+        self.opstack.clear();
     }
 }

@@ -134,6 +134,13 @@ impl Interpreter
                 }
             }
 
+            "clear" =>
+            {
+                self.clear();
+
+                Ok(true)
+            }
+
             _ => Ok(false),
         }
     }

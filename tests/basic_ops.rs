@@ -97,16 +97,18 @@ fn test_pop_underflow() {
 
 // Normal test case to ensure exch function is working properly.
 #[test]
-fn test_exch_normal() {
-    let mut interp = Interpreter::new(ScopeMode::Dynamic);
+fn test_exch_normal()
+{
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
 
-    interp.interpret("10 20 exch").unwrap(); // should become [20, 10]
+    postscript_interpreter.interpret("10 20 exch").unwrap(); // should become [20, 10]
 
-    let stack = interp.opstack_snapshot();
+    let stack = postscript_interpreter.opstack_snapshot();
 
     assert_eq!(stack.len(), 2);
 
-    match (&stack[0], &stack[1]) {
+    match (&stack[0], &stack[1])
+    {
         (Value::Int(20), Value::Int(10)) => {},
         _ => panic!("exch failed: expected [20, 10]"),
     }
@@ -115,7 +117,8 @@ fn test_exch_normal() {
 // Edge test case to ensure exch function results in error if there
 // is less than two values on the stack.
 #[test]
-fn test_exch_underflow() {
+fn test_exch_underflow()
+{
     let mut interp = Interpreter::new(ScopeMode::Dynamic);
 
     let result = interp.interpret("1 exch");
@@ -139,4 +142,28 @@ fn test_def_normal()
         Value::Int(10) => {}
         _ => panic!("expected 10"),
     }
+}
+
+// Normal test case to ensure the clear function is working properly.
+#[test]
+fn test_clear_normal()
+{
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+    postscript_interpreter.interpret("1 2 3 4").unwrap();
+
+    let mut stack = postscript_interpreter.opstack_snapshot();
+
+    assert_eq!(stack.len(), 4);
+
+    match (&stack[0], &stack[1], &stack[2], &stack[3])
+    {
+        (Value::Int(1), Value::Int(2), Value::Int(3), Value::Int(4)) => {},
+        _ => panic!("exch failed: expected [20, 10]"),
+    }
+
+    postscript_interpreter.interpret("clear").unwrap();
+
+    stack = postscript_interpreter.opstack_snapshot();
+
+    assert_eq!(stack.len(), 0);
 }

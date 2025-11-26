@@ -1,0 +1,18 @@
+# Ignore build artifacts
+/target/
+
+# Ignore Cargo lock file (for libraries)
+Cargo.lock
+
+# Ignore backup files
+*.log
+*.tmp
+*.swp
+
+# Ignore editor-specific files
+.vscode/
+.idea/
+
+# Ignore OS-specific junk
+.DS_Store
+Thumbs.db
