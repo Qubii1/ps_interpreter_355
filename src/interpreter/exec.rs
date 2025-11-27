@@ -45,8 +45,6 @@ impl Interpreter
     pub fn interpret(&mut self, src: &str) -> InterpreterResult 
     {
         let tokens = tokenize(src)?;
-        println!("TOKENS: {:?}", tokens);
-
         self.exec_tokens(&tokens, None)
         
     }

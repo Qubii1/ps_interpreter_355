@@ -125,7 +125,7 @@ fn test_length_dictionary_normal()
     postscript_interpreter.interpret("2 dict").unwrap();      // create dict with capacity 2
     postscript_interpreter.interpret("dup begin").unwrap();   // begin scope on the same dict (dup keeps it)
     postscript_interpreter.interpret("/x 10 def /y 20 def").unwrap(); // define some variables
-    //postscript_interpreter.interpret("end").unwrap();         // leave dict on operand stack
+    postscript_interpreter.interpret("end").unwrap();         // leave dict on operand stack
     postscript_interpreter.interpret("length").unwrap();      // ask for dictionary length
 
     let stack = postscript_interpreter.opstack_snapshot();
