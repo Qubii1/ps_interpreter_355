@@ -508,6 +508,113 @@ impl Interpreter
                 Ok(true)
             }
 
+            "eq" =>
+            {
+                let b = self.pop()?;
+                let a = self.pop()?;
+
+                let result = match (a, b)
+                {
+                    (Value::Int(x), Value::Int(y)) => x == y,
+                    (Value::Bool(x), Value::Bool(y)) => x == y,
+                    (Value::Str(x), Value::Str(y)) => x == y,
+                    _ => return Err("eq type error".into()),
+                };
+
+                self.push(Value::Bool(result));
+                Ok(true)
+            }
+
+            "ne" =>
+            {
+                let b = self.pop()?;
+                let a = self.pop()?;
+
+                let result = match (a, b)
+                {
+                    (Value::Int(x), Value::Int(y)) => x != y,
+                    (Value::Bool(x), Value::Bool(y)) => x != y,
+                    (Value::Str(x), Value::Str(y)) => x != y,
+                    _ => return Err("ne type error".into()),
+                };
+
+                self.push(Value::Bool(result));
+                Ok(true)
+            }
+
+            "gt" =>
+            {
+                let b = self.pop()?;
+                let a = self.pop()?;
+
+                let result = match (a, b)
+                {
+                    (Value::Int(x), Value::Int(y)) => x > y,
+                    _ => return Err("gt expects integers".into()),
+                };
+
+                self.push(Value::Bool(result));
+                Ok(true)
+            }
+
+            "lt" =>
+            {
+                let b = self.pop()?;
+                let a = self.pop()?;
+
+                let result = match (a, b)
+                {
+                    (Value::Int(x), Value::Int(y)) => x < y,
+                    _ => return Err("lt expects integers".into()),
+                };
+
+                self.push(Value::Bool(result));
+                Ok(true)
+            }
+
+            "and" =>
+            {
+                let b = self.pop()?;
+                let a = self.pop()?;
+
+                let result = match (a, b)
+                {
+                    (Value::Bool(x), Value::Bool(y)) => x && y,
+                    _ => return Err("and expects booleans".into()),
+                };
+
+                self.push(Value::Bool(result));
+                Ok(true)
+            }
+
+            "or" =>
+            {
+                let b = self.pop()?;
+                let a = self.pop()?;
+
+                let result = match (a, b)
+                {
+                    (Value::Bool(x), Value::Bool(y)) => x || y,
+                    _ => return Err("or expects booleans".into()),
+                };
+
+                self.push(Value::Bool(result));
+                Ok(true)
+            }
+
+            "not" =>
+            {
+                let a = self.pop()?;
+
+                let result = match a
+                {
+                    Value::Bool(x) => !x,
+                    _ => return Err("not expects boolean".into()),
+                };
+
+                self.push(Value::Bool(result));
+                Ok(true)
+            }
 
             // Clears all the values in the stack
             "clear" =>
