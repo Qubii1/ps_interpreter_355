@@ -29,6 +29,8 @@ pub enum Value
     // Variable names (ex. /x)
     Name(String),
 
+    Dict(std::collections::HashMap<String, Value>),
+
     // Procedure blocks (ex. {5 2 add})
     Procedure(Vec<super::tokenizer::Token>, Option<EnvRef>),
 }

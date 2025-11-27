@@ -1,83 +1,15 @@
 // -----------------------------------------------------------------------------
-// File: basic_ops.rs
+// File: stack_operation_tests.rs
 // Author: Quinn Bankhead
 // Project: PostScript Interpreter (CptS 355 - Mini Project)
 // Description:
 // Unit tests for basic operations.
 // -----------------------------------------------------------------------------
 
+
 use ps_interpreter::{Interpreter, ScopeMode};
 use ps_interpreter::interpreter::value::Value;
 
-// Normal test case to ensure the add function is working properly.
-#[test]
-fn test_add_normal()
-{
-    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
-    postscript_interpreter.interpret("2 3 add").unwrap();
-
-    match postscript_interpreter.peek().unwrap()
-    {
-        Value::Int(n) => assert_eq!(*n, 5),
-        _ => panic!("expected int"),
-    }
-}
-
-// Normal test case to ensure the mul function is working properly.
-#[test]
-fn test_mul_normal()
-{
-    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
-    postscript_interpreter.interpret("2 3 mul").unwrap();
-
-    match postscript_interpreter.peek().unwrap()
-    {
-        Value::Int(n) => assert_eq!(*n, 6),
-        _ => panic!("expected int"),
-    }
-}
-
-// Normal test case to ensure the sub function is working properly.
-#[test]
-fn test_sub_normal()
-{
-    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
-    postscript_interpreter.interpret("3 2 sub").unwrap();
-
-    match postscript_interpreter.peek().unwrap()
-    {
-        Value::Int(n) => assert_eq!(*n, 1),
-        _ => panic!("expected int"),
-    }
-}
-
-// Normal test case to ensure the div function is working properly.
-#[test]
-fn test_div_normal()
-{
-    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
-    postscript_interpreter.interpret("6 3 div").unwrap();
-
-    match postscript_interpreter.peek().unwrap()
-    {
-        Value::Int(n) => assert_eq!(*n, 2),
-        _ => panic!("expected int"),
-    }
-}
-
-// Normal test case to ensure the div function is working properly.
-#[test]
-fn test_mod_normal()
-{
-    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
-    postscript_interpreter.interpret("6 3 mod").unwrap();
-
-    match postscript_interpreter.peek().unwrap()
-    {
-        Value::Int(n) => assert_eq!(*n, 0),
-        _ => panic!("expected int"),
-    }
-}
 
 // Normal test case to ensure the dup function is working properly.
 #[test]
@@ -233,44 +165,4 @@ fn test_exch_underflow()
 
     let result2 = interp.interpret("exch");
     assert!(result2.is_err(), "exch with zero values should error");
-}
-
-
-
-// Normal test case to ensure the def function is working properly.
-#[test]
-fn test_def_normal()
-{
-    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
-    postscript_interpreter.interpret("/x 10 def x").unwrap();
-    
-    match postscript_interpreter.peek().unwrap()
-    {
-        Value::Int(10) => {}
-        _ => panic!("expected 10"),
-    }
-}
-
-// Normal test case to ensure the clear function is working properly.
-#[test]
-fn test_clear_normal()
-{
-    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
-    postscript_interpreter.interpret("1 2 3 4").unwrap();
-
-    let mut stack = postscript_interpreter.opstack_snapshot();
-
-    assert_eq!(stack.len(), 4);
-
-    match (&stack[0], &stack[1], &stack[2], &stack[3])
-    {
-        (Value::Int(1), Value::Int(2), Value::Int(3), Value::Int(4)) => {},
-        _ => panic!("exch failed: expected [20, 10]"),
-    }
-
-    postscript_interpreter.interpret("clear").unwrap();
-
-    stack = postscript_interpreter.opstack_snapshot();
-
-    assert_eq!(stack.len(), 0);
 }

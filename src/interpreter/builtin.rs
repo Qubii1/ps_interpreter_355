@@ -195,6 +195,32 @@ impl Interpreter
                 Ok(true)
             }
 
+            "dict" =>
+            {
+                // Pop the size argument
+                let size_val = self.pop()?;
+
+                // Check that it's an int
+                let size = match size_val 
+                {
+                    Value::Int(i) => i,
+                    _ => return Err("dict expects an integer size".into()),
+                };
+
+                if size < 0 
+                {
+                    return Err("dict size cannot be negative".into());
+                }
+
+                // Create a new empty dictionary
+                let new_dict = std::collections::HashMap::new();
+
+                // Wrap it as Value::Dict
+                self.push(Value::Dict(new_dict));
+
+                Ok(true)
+            }
+
 
             "def" =>
             {
