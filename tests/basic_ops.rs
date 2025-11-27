@@ -132,6 +132,50 @@ fn test_copy_normal()
     }
 }
 
+// Edge test case for ensuring that when copy amount is higher
+// than stack count it throws error
+#[test]
+fn test_copy_underflow() {
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+
+    // Stack only has 2 values but we ask for 3 copy
+    let result = postscript_interpreter.interpret("10 20 3 copy");
+
+    assert!(result.is_err(), "copy should error when n > stack size");
+}
+
+// Normal test case for ensuring count functionality works
+#[test]
+fn test_count_normal() {
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+
+    postscript_interpreter.interpret("1 2 3 count").unwrap();
+
+    let stack = postscript_interpreter.opstack_snapshot();
+
+    match stack.last().unwrap()
+    {
+        Value::Int(n) => assert_eq!(*n, 3),
+        _ => panic!("count failed: expected 3"),
+    }
+}
+
+// Edge test case for making sure when stack is empty count
+// function will still push 0 and not throw error
+#[test]
+fn test_count_empty() {
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+
+    postscript_interpreter.interpret("count").unwrap();
+
+    let stack = postscript_interpreter.opstack_snapshot();
+
+    match stack.last().unwrap() 
+    {
+        Value::Int(n) => assert_eq!(*n, 0),
+        _ => panic!("count failed: expected 0"),
+    }
+}
 
 // Normal test case to ensure pop function is working properly
 #[test]

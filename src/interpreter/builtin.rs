@@ -140,6 +140,7 @@ impl Interpreter
                 Ok(true)
             }
 
+            // Copies the top n values and pushes them to the stack in order
             "copy" =>
             {
                 // Pop the count
@@ -181,6 +182,19 @@ impl Interpreter
 
                 Ok(true)
             }
+
+            // gets the number of items on the operand stack
+            "count" =>
+            {
+                // length of the operand stack
+                let n = self.opstack.len() as i32;
+
+                // push the count
+                self.push(Value::Int(n));
+
+                Ok(true)
+            }
+
 
             "def" =>
             {
