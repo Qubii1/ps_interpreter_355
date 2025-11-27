@@ -668,6 +668,33 @@ impl Interpreter
                 Ok(true)
             }
 
+            "if" =>
+            {
+                let procedure_value = self.pop()?;
+                let boolean_value = self.pop()?;
+
+                // Make sure its a valid procedure
+                let procedure = match procedure_value
+                {
+                    Value::Procedure(body, captured) => (body, captured),
+                    _ => return Err("if expects a procedure".into()),
+                };
+
+                // Make sure its a valid boolean
+                let boolean = match boolean_value
+                {
+                    Value::Bool(b) => b,
+                    _ => return Err("if expects boolean".into()),
+                };
+
+                // Only execute if boolean is true
+                if boolean
+                {
+                    self.exec_tokens(&procedure.0, procedure.1)?;
+                }
+
+                Ok(true)
+            }
 
 
             // Clears all the values in the stack
