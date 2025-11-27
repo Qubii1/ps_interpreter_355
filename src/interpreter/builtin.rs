@@ -344,6 +344,50 @@ impl Interpreter
                 }
             }
 
+            "get" =>
+            {
+                // Pop index
+                let index_val = self.pop()?;
+
+                // Make sure its a valid integer value
+                let index = match index_val
+                {
+                    Value::Int(i) => i,
+                    _ => return Err("get expects integer index".into()),
+                };
+
+                // Invalid index should throw error
+                if index < 0
+                {
+                    return Err("get index out of bounds".into());
+                }
+
+                // Pop string
+                let string_val = self.pop()?;
+
+                // Make sure string is valid
+                let string = match string_val
+                {
+                    Value::Str(string_to_validate) => string_to_validate,
+                    _ => return Err("get expects string".into()),
+                };
+
+                let i = index as usize;
+
+                // Index greater than string length should throw error
+                if i >= string.len()
+                {
+                    return Err("get index out of bounds".into());
+                }
+
+                // Convert char to i32 ASCII code
+                let target_character = string.as_bytes()[i] as i32;
+
+                // Push to stack
+                self.push(Value::Int(target_character));
+                Ok(true)
+            }
+
             // Clears all the values in the stack
             "clear" =>
             {
