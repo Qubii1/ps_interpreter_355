@@ -59,6 +59,25 @@ impl Interpreter
                 Ok(true)
             }
 
+            // Multiplies two valid integer values.
+            "mul" =>
+            {
+                // Pop the first value off the stack.
+                let b = self.pop()?;
+
+                // Pop the second value off the stack.
+                let a = self.pop()?;
+
+                // Push the result of adding a + b to the stack.
+                self.push(match (a, b)
+                {
+                    (Value::Int(x), Value::Int(y)) => Value::Int(x * y),
+                    _ => return Err("Type error in add".to_string()),
+                });
+
+                Ok(true)
+            }
+
             // Duplicates the top of the Operand Stack
             "dup" =>
             {
