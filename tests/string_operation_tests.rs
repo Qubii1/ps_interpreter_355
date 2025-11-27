@@ -70,11 +70,11 @@ fn test_get_out_of_bounds()
 #[test]
 fn test_getinterval_normal()
 {
-    let mut interp = Interpreter::new(ScopeMode::Dynamic);
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
 
-    interp.interpret("(hello) 1 3 getinterval").unwrap();
+    postscript_interpreter.interpret("(hello) 1 3 getinterval").unwrap();
 
-    match interp.peek().unwrap()
+    match postscript_interpreter.peek().unwrap()
     {
         Value::Str(s) => assert_eq!(s, "ell"),
         _ => panic!("expected substring 'ell'"),
@@ -86,13 +86,41 @@ fn test_getinterval_normal()
 #[test]
 fn test_getinterval_range_error()
 {
-    let mut interp = Interpreter::new(ScopeMode::Dynamic);
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
 
     // "hi" is length 2 → (hi) 1 5 getinterval is invalid
-    let result = interp.interpret("(hi) 1 5 getinterval");
+    let result = postscript_interpreter.interpret("(hi) 1 5 getinterval");
 
     assert!(result.is_err(), "expected range error for out-of-bounds substring");
 }
+
+// Normal test case to ensure putinterval is working correctly
+#[test]
+fn test_putinterval_normal()
+{
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+
+    postscript_interpreter.interpret("(hello) 1 (XYZ) putinterval").unwrap();
+
+    match postscript_interpreter.peek().unwrap()
+    {
+        Value::Str(s) => assert_eq!(s, "hXYZo"),
+        _ => panic!("expected hXYZo"),
+    }
+}
+
+// Edge test case to ensure out of range mutation
+// throws error
+#[test]
+fn test_putinterval_range_error() {
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+
+    let result = postscript_interpreter.interpret("(hi) 1 (abcd) putinterval");
+
+    assert!(result.is_err(), "putinterval should error when source exceeds target bounds");
+}
+
+
 
 
 

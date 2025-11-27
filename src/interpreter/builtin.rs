@@ -450,6 +450,65 @@ impl Interpreter
                 Ok(true)
             }
 
+            "putinterval" =>
+            {
+                // Pop source string
+                let source_val = self.pop()?;
+
+                // Ensure string is valid
+                let source = match source_val
+                {
+                    Value::Str(string_to_check) => string_to_check,
+                    _ => return Err("putinterval expects source string".into()),
+                };
+
+                // Pop index
+                let index_val = self.pop()?;
+
+                // Ensure index is valid integer
+                let index = match index_val
+                {
+                    Value::Int(i) => i,
+                    _ => return Err("putinterval expects integer index".into()),
+                };
+
+                // Negative index should throw error
+                if index < 0
+                {
+                    return Err("putinterval index cannot be negative".into());
+                }
+
+                let string_index = index as usize;
+
+                // Pop target string
+                let target_val = self.pop()?;
+
+                // Ensure string is valid
+                let mut target = match target_val
+                {
+                    Value::Str(string_to_check) => string_to_check,
+                    _ => return Err("putinterval expects target string".into()),
+                };
+
+                // Bounds check
+                if string_index + source.len() > target.len()
+                {
+                    return Err("putinterval range error".into());
+                }
+
+                // Mutate the target string
+                for (i, current_character) in source.chars().enumerate()
+                {
+                    target.replace_range(string_index + i .. string_index + i + 1, &current_character.to_string());
+                }
+
+                // Push mutated string back
+                self.push(Value::Str(target));
+
+                Ok(true)
+            }
+
+
             // Clears all the values in the stack
             "clear" =>
             {
