@@ -32,6 +32,10 @@ pub fn parse_atomic_token(raw: &str) -> Result<Token, String>
         return Ok(Token::Literal(Value::Int(i)));
     }
 
+    if let Ok(f ) = raw.parse::<f64>()
+    {
+        return Ok(Token::Literal(Value::Real(f)));
+    }
     if raw == "true"
     {
         // The token is a boolean type with the value true.

@@ -36,6 +36,7 @@ impl Interpreter
                 self.push(match (a, b)
                 {
                     (Value::Int(x), Value::Int(y)) => Value::Int(x + y),
+                    (Value::Real(x), Value::Real(y)) => Value::Real(x + y),
                     _ => return Err("Type error in add".to_string()),
                 });
 
@@ -55,6 +56,7 @@ impl Interpreter
                 self.push(match (a, b)
                 {
                     (Value::Int(x), Value::Int(y)) => Value::Int(x - y),
+                    (Value::Real(x), Value::Real(y)) => Value::Real(x - y),
                     _ => return Err("Type error in sub".to_string()),
                 });
 
@@ -74,6 +76,7 @@ impl Interpreter
                 self.push(match (a, b)
                 {
                     (Value::Int(x), Value::Int(y)) => Value::Int(x * y),
+                    (Value::Real(x), Value::Real(y)) => Value::Real(x * y),
                     _ => return Err("Type error in add".to_string()),
                 });
 
@@ -92,7 +95,9 @@ impl Interpreter
                 // Push the result of subtracting a / b to the stack.
                 self.push(match (a, b)
                 {
+                    (Value::Int(1), Value::Int(0)) => return Err("Dividing by zero will not compute".to_string()),
                     (Value::Int(x), Value::Int(y)) => Value::Int(x / y),
+                    (Value::Real(x), Value::Real(y)) => Value::Real(x / y),
                     _ => return Err("Type error in sub".to_string()),
                 });
 
@@ -111,6 +116,7 @@ impl Interpreter
                 // Push the result of subtracting a % b to the stack.
                 self.push(match (a, b)
                 {
+                    (Value::Int(_x), Value::Int(0)) => return Err("Modulus by zero will not compute".to_string()),
                     (Value::Int(x), Value::Int(y)) => Value::Int(x % y),
                     _ => return Err("Type error in sub".to_string()),
                 });
@@ -516,6 +522,7 @@ impl Interpreter
                 let result = match (a, b)
                 {
                     (Value::Int(x), Value::Int(y)) => x == y,
+                    (Value::Real(x), Value::Real(y)) => x == y,
                     (Value::Bool(x), Value::Bool(y)) => x == y,
                     (Value::Str(x), Value::Str(y)) => x == y,
                     _ => return Err("eq type error".into()),
@@ -533,6 +540,7 @@ impl Interpreter
                 let result = match (a, b)
                 {
                     (Value::Int(x), Value::Int(y)) => x != y,
+                    (Value::Real(x), Value::Real(y)) => x != y,
                     (Value::Bool(x), Value::Bool(y)) => x != y,
                     (Value::Str(x), Value::Str(y)) => x != y,
                     _ => return Err("ne type error".into()),
@@ -550,6 +558,7 @@ impl Interpreter
                 let result = match (a, b)
                 {
                     (Value::Int(x), Value::Int(y)) => x > y,
+                    (Value::Real(x), Value::Real(y)) => x > y,
                     _ => return Err("gt expects integers".into()),
                 };
 
@@ -565,6 +574,7 @@ impl Interpreter
                 let result = match (a, b)
                 {
                     (Value::Int(x), Value::Int(y)) => x < y,
+                    (Value::Real(x), Value::Real(y)) => x < y,
                     _ => return Err("lt expects integers".into()),
                 };
 

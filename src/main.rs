@@ -14,10 +14,6 @@ fn main()
     // Create an interpreter.
     let mut postscript_interpreter = Interpreter::new(ScopeMode::Lexical);
 
-    // Give the program an input string to execute.
-    //let program = "/x 10 def x 5 add";
-    //println!("Running: {}", program);
-
     // REPL
     loop 
     {
