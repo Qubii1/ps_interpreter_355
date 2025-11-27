@@ -65,6 +65,20 @@ fn test_div_normal()
     }
 }
 
+// Normal test case to ensure the div function is working properly.
+#[test]
+fn test_mod_normal()
+{
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+    postscript_interpreter.interpret("6 3 mod").unwrap();
+
+    match postscript_interpreter.peek().unwrap()
+    {
+        Value::Int(n) => assert_eq!(*n, 0),
+        _ => panic!("expected int"),
+    }
+}
+
 // Normal test case to ensure the dup function is working properly.
 #[test]
 fn test_dup_normal()
