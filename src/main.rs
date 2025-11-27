@@ -6,17 +6,29 @@
 // The entry point to the Rust postscript interpreter project.
 // -----------------------------------------------------------------------------
 
+use std::env;
 use std::io::{self, Write};
 use ps_interpreter::{Interpreter, ScopeMode};
 
 fn main()
 {
+    let args: Vec<String> = env::args().collect();
+
+    let scope = if args.contains(&"--lexical".to_string())
+    {
+        ScopeMode::Lexical
+    }
+    else
+    {
+        ScopeMode::Dynamic
+    };
     // Create an interpreter.
-    let mut postscript_interpreter = Interpreter::new(ScopeMode::Lexical);
+    let mut postscript_interpreter = Interpreter::new(scope);
 
     // REPL
     loop 
     {
+        println!("Interpreter is currently in {:?} scoping mode", postscript_interpreter.scope_mode);
         // print prompt like it is in postscript, and flush so it appears immediately.
         // without the flush Rust doesnt actually print it to the console.
         if postscript_interpreter.len() > 0
