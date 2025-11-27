@@ -616,6 +616,60 @@ impl Interpreter
                 Ok(true)
             }
 
+            "print" =>
+            {
+                let string_to_print = self.pop()?;
+
+                match string_to_print
+                {
+                    Value::Str(string) =>
+                    {
+                        print!("{}", string); // no newline
+                    }
+                    _ => return Err("print expects a string".into()),
+                }
+
+                Ok(true)
+            }
+
+            "=" =>
+            {
+                let value = self.pop()?;
+
+                match value
+                {
+                    Value::Int(i) => println!("{}", i),
+                    Value::Real(f) => println!("{}", f),
+                    Value::Bool(b) => println!("{}", b),
+                    Value::Str(s) => println!("{}", s),
+                    Value::Name(n) => println!("/{}", n),
+                    Value::Dict(_) => println!("--dict--"),
+                    Value::Procedure(_, _) => println!("--procedure--"),
+                }
+
+                Ok(true)
+            }
+
+            "==" =>
+            {
+                let value = self.pop()?;
+
+                match value
+                {
+                    Value::Int(i) => println!("{}", i),
+                    Value::Real(f) => println!("{}", f),
+                    Value::Bool(b) => println!("{}", b),
+                    Value::Str(s) => println!("({})", s), // literal string
+                    Value::Name(n) => println!("/{}", n),
+                    Value::Dict(_) => println!("--dict--"),
+                    Value::Procedure(_, _) => println!("--procedure--"),
+                }
+
+                Ok(true)
+            }
+
+
+
             // Clears all the values in the stack
             "clear" =>
             {
