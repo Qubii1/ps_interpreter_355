@@ -111,6 +111,27 @@ fn test_dup_underflow() {
     assert!(result.is_err(), "dup on an empty stack should produce an error");
 }
 
+// Normal test case to ensure copy function is working properly
+#[test]
+fn test_copy_normal() 
+{
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+
+    // 1 2 3 2 copy
+    postscript_interpreter.interpret("1 2 3 2 copy").unwrap();
+
+    let stack = postscript_interpreter.opstack_snapshot();
+
+    // Expected: [1, 2, 3, 2, 3]
+    assert_eq!(stack.len(), 5);
+
+    match (&stack[0], &stack[1], &stack[2], &stack[3], &stack[4]) 
+    {
+        (Value::Int(1), Value::Int(2), Value::Int(3), Value::Int(2), Value::Int(3)) => {}
+        _ => panic!("copy did not duplicate correctly"),
+    }
+}
+
 
 // Normal test case to ensure pop function is working properly
 #[test]

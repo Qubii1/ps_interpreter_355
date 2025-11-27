@@ -140,6 +140,40 @@ impl Interpreter
                 Ok(true)
             }
 
+            "copy" =>
+            {
+                // Pop the count
+                let count_val = self.pop()?;
+
+                // Extract an integer from the Value
+                let n = match count_val 
+                {
+                    Value::Int(i) => i as usize,
+                    _ => return Err("copy expects an integer count".into()),
+                };
+
+                // Ensure the stack has enough values
+                let stack_len = self.opstack.len();
+                if n > stack_len 
+                {
+                    return Err("copy expects more operands on the stack".into());
+                }
+
+                // Snapshot current stack
+                let snapshot = self.opstack.snapshot();
+
+                // Get the last n elements
+                let slice = &snapshot[stack_len - n..];
+
+                // Push clones back on stack
+                for v in slice 
+                {
+                    self.push(v.clone());
+                }
+
+                Ok(true)
+            }
+
             // Pops the top of the stack.
             "pop" =>
             {
