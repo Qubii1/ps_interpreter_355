@@ -134,6 +134,7 @@ impl Interpreter
                 }
             }
 
+            // Clears all the values in the stack
             "clear" =>
             {
                 self.clear();
