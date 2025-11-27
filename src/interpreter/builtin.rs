@@ -696,6 +696,45 @@ impl Interpreter
                 Ok(true)
             }
 
+            "ifelse" =>
+            {
+                let false_procedure_value = self.pop()?;
+                let true_procedure_value = self.pop()?;
+                let boolean_value = self.pop()?;
+
+                // Makes sure false procedure is valid
+                let false_proc = match false_procedure_value
+                {
+                    Value::Procedure(body, captured) => (body, captured),
+                    _ => return Err("ifelse expects a procedure".into()),
+                };
+
+                // makes sure true procedure is valid
+                let true_proc = match true_procedure_value
+                {
+                    Value::Procedure(body, captured) => (body, captured),
+                    _ => return Err("ifelse expects a procedure".into()),
+                };
+
+                // Makes sure boolean is valid
+                let boolean = match boolean_value
+                {
+                    Value::Bool(b) => b,
+                    _ => return Err("ifelse expects boolean".into()),
+                };
+
+                // Execute true procedure if true, otherwise execute false procedure
+                if boolean
+                {
+                    self.exec_tokens(&true_proc.0, true_proc.1)?;
+                }
+                else
+                {
+                    self.exec_tokens(&false_proc.0, false_proc.1)?;
+                }
+
+                Ok(true)
+            }
 
             // Clears all the values in the stack
             "clear" =>
