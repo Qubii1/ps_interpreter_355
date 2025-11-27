@@ -45,18 +45,10 @@ impl Interpreter
     pub fn interpret(&mut self, src: &str) -> InterpreterResult 
     {
         let tokens = tokenize(src)?;
+        println!("TOKENS: {:?}", tokens);
+
+        self.exec_tokens(&tokens, None)
         
-        let env = match self.scope_mode
-        {
-            // If the scope mode is lexical it needs to capture the current
-            // defined environment
-            ScopeMode::Lexical => Some(self.dict.env()),
-
-            // Otherwise it will rely on the dictionary stack for dynamic scoping.
-            ScopeMode::Dynamic => None,
-        };
-
-        self.exec_tokens(&tokens, env)
     }
 
 
@@ -94,7 +86,8 @@ impl Interpreter
                             }
                             else
                             {
-                                self.dict.lookup_dynamic(name)
+                                let global_env = self.dict.env();
+                                self.dict.lookup_lexical(name, &global_env)
                             }
                         }
                     }.ok_or_else(|| format!("Undefined name: {}", name))?;

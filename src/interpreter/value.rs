@@ -8,6 +8,9 @@
 // -----------------------------------------------------------------------------
 
 use super::dict::EnvRef;
+use std::collections::HashMap;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 // These are the values that we want to push onto the stack
 // when encountered.
@@ -29,7 +32,7 @@ pub enum Value
     // Variable names (ex. /x)
     Name(String),
 
-    Dict(std::collections::HashMap<String, Value>),
+    Dict(Rc<RefCell<HashMap<String, Value>>>),
 
     // Procedure blocks (ex. {5 2 add})
     Procedure(Vec<super::tokenizer::Token>, Option<EnvRef>),

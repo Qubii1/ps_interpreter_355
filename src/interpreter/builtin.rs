@@ -7,9 +7,11 @@
 // able to execute.
 // -----------------------------------------------------------------------------
 
+
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use super::dict::Dict;
 use super::scope::ScopeMode;
 use super::value::Value;
 use super::exec::Interpreter;
@@ -213,7 +215,7 @@ impl Interpreter
                 }
 
                 // Create a new empty dictionary
-                let new_dict = std::collections::HashMap::new();
+                let new_dict = Rc::new(RefCell::new(std::collections::HashMap::new()));
 
                 // Wrap it as Value::Dict
                 self.push(Value::Dict(new_dict));
@@ -235,7 +237,7 @@ impl Interpreter
 
                 // Push dictionary onto dictionary stack
                 let env_ref = self.dict.env(); // persistent dicitonary stack reference
-                let mut env: std::cell::RefMut<'_, Vec<std::collections::HashMap<String, Value>>> = env_ref.borrow_mut(); // borrow 
+                let mut env  = env_ref.borrow_mut(); // borrow 
                 env.push(new_dict);
 
                 Ok(true)
@@ -254,9 +256,27 @@ impl Interpreter
                 }
 
                 env.pop();
-                
+
                 Ok(true)
             }
+
+            "length" =>
+            {
+                let object = self.pop()?;
+
+                let len = match object 
+                {
+                    Value::Str(string) => string.len() as i32,
+
+                    Value::Dict(dictionary) => dictionary.borrow().len() as i32,
+
+                    _ => return Err("length expects string, dict".into()),
+                };
+
+                self.push(Value::Int(len));
+                Ok(true)
+            }
+
 
 
             "def" =>
@@ -274,14 +294,36 @@ impl Interpreter
                         // LEXICAL: capture the environment at definition time
                         ( ScopeMode::Lexical, Value::Procedure(body, _) ) =>
                         {
-                            // Clone dictionary stack (Vec<Dict>) at definition time
-                            let snapshot = self.dict.env().borrow().clone();
+                             // Deep-copy the whole dictionary stack into a new EnvRef,
+                            // but make sure the borrow does NOT live past this inner block.
+                            let snapshot_vec: Vec<Dict> =
+                            {
+                                // Get current environment (vector of Dict = Rc<RefCell<HashMap<...>>>)
+                                let env_ref = self.dict.env();
+                                let env_borrow = env_ref.borrow();
 
-                            let captured = Value::Procedure(
-                                body.clone(),
-                                Some(Rc::new(RefCell::new(snapshot)))
-                            );
+                                let mut snapshot = Vec::new();
+                                for dict_ref in env_borrow.iter()
+                                {
+                                    // &HashMap<String, Value>
+                                    let dict = dict_ref.borrow();
 
+                                    // deep copy the map
+                                    let cloned_map = dict.clone();
+
+                                    // wrap in a new Rc<RefCell<_>>
+                                    let new_dict: Dict = Rc::new(RefCell::new(cloned_map));
+                                    snapshot.push(new_dict);
+                                }
+
+                                snapshot   // <- returned out of the block
+                            }; // <- env_borrow and env_ref are dropped RIGHT HERE
+
+                            // Wrap the cloned vec in a new EnvRef
+                            let captured_env = Rc::new(RefCell::new(snapshot_vec));
+
+                            // Store procedure with its frozen lexical environment
+                            let captured = Value::Procedure(body.clone(), Some(captured_env));
                             self.dict.define(&n, captured);
                         }
                         // DYNAMIC: store the procedure as-is (no captured env)

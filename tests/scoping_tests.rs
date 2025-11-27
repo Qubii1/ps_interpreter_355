@@ -45,7 +45,8 @@ fn test_lexical_scope_basic() {
     postscript_interpreter.interpret("f").unwrap();
 
     // Lexical scope → should use x = 10
-    match postscript_interpreter.peek().unwrap() {
+    match postscript_interpreter.peek().unwrap() 
+    {
         Value::Int(10) => {},
         _ => panic!("Lexical scoping failed: expected 10"),
     }

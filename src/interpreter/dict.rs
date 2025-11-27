@@ -13,7 +13,7 @@ use std::rc::Rc;
 
 use super::value::Value;
 
-pub type Dict = HashMap<String, Value>;
+pub type Dict = Rc<RefCell<HashMap<String, Value>>>;
 pub type EnvRef = Rc<RefCell<Vec<Dict>>>;
 
 #[derive(Debug)]
@@ -26,6 +26,10 @@ impl DictStack
 {
     pub fn new() -> Self
     {
+
+        // Create an empty global dictionary and wrap it in a Rc<RefCell>>
+        let global_dict: Dict = Rc::new(RefCell::new(HashMap::new()));
+
         // Probably the most complicated piece of code.
         // Breaking it down in pieces here is what it does:
         // 1) Vec<HashMap<String, Value>>: This piece will create a vector of dictionaries
@@ -38,7 +42,7 @@ impl DictStack
         // multiple parts of the interpreter can share the environment, for example
         // the main interpreter, or the procedures that capture this environment
         // for lexical scoping.
-        let env: Rc<RefCell<Vec<HashMap<String, Value>>>> = Rc::new(RefCell::new(vec![HashMap::new()]));
+        let env: EnvRef = Rc::new(RefCell::new(vec![global_dict]));
         Self { stack: env }
     }
 
@@ -66,22 +70,24 @@ impl DictStack
 
         // env.last_mut() will get a mutable reference to the top
         // dictionary on the stack, and inserts the name and value to the stack.
-        env.last_mut().unwrap().insert(name.to_string(), value);
+        env.last_mut().unwrap().borrow_mut().insert(name.to_string(), value);
     }
 
     // Dynamic scoping
     pub fn lookup_dynamic(&self, name: &str) -> Option<Value>
     {
         // .borrow() will actually get an immutable reference to the Dictionary stack.
-        let env: std::cell::Ref<'_, Vec<HashMap<String, Value>>> = self.stack.borrow();
+        let env = self.stack.borrow();
 
         // This implements the dynamic scoping rule:
         // Search all dictionary frames from top to bottom, returning the first match.
         // Will return Some(&Value) if found, None if not found.
         // env.iter().rev():
         // Iterate over the vec from top to bottom (last to first), so more recent scopes shadow older ones.
-        for dict in env.iter().rev()
+        for dict_ref in env.iter().rev()
         {
+            let dict = dict_ref.borrow();
+
             if let Some(v) = dict.get(name)
             {
                 // Clone the value so we return an owned copy.
@@ -97,8 +103,10 @@ impl DictStack
         // Lexical scoping will use the captured environment (ctx) not self.stack
         // where the procedure was defined.
         let env = ctx.borrow();
-        for dict in env.iter().rev()
+        for dict_ref in env.iter().rev()
         {
+            let dict = dict_ref.borrow();
+
             if let Some(v) = dict.get(name)
             {
                 return Some(v.clone());

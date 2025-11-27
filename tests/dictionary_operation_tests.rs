@@ -23,7 +23,7 @@ fn test_dict_normal()
 
     match top 
     {
-        Value::Dict(d) => assert!(d.is_empty(), "dict should create an empty dictionary"),
+        Value::Dict(dictionary) => assert!(dictionary.borrow().is_empty(), "dict should create an empty dictionary"),
         _ => panic!("dict should push a dictionary"),
     }
 }
@@ -115,5 +115,47 @@ fn test_end_underflow()
 
     assert!(result.is_err(), "end should error when popping bottom dictionary");
 }
+
+// Normal test case to ensure lenght for dictionary is working
+#[test]
+fn test_length_dictionary_normal()
+{
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+ 
+    postscript_interpreter.interpret("2 dict").unwrap();      // create dict with capacity 2
+    postscript_interpreter.interpret("dup begin").unwrap();   // begin scope on the same dict (dup keeps it)
+    postscript_interpreter.interpret("/x 10 def /y 20 def").unwrap(); // define some variables
+    //postscript_interpreter.interpret("end").unwrap();         // leave dict on operand stack
+    postscript_interpreter.interpret("length").unwrap();      // ask for dictionary length
+
+    let stack = postscript_interpreter.opstack_snapshot();
+    let top = stack.last().unwrap();
+
+    match top
+    {
+        Value::Int(n) => assert_eq!(*n, 2),
+        _ => panic!("expected dictionary length = 2"),
+    }
+}
+
+
+// Edge case test to ensure if dictionary is empty it doesnt throw error
+// should just return 0
+#[test]
+fn test_length_empty_dictionary()
+{
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+
+    postscript_interpreter.interpret("0 dict length").unwrap();
+
+    let top = postscript_interpreter.peek().unwrap();
+
+    match top
+    {
+        Value::Int(n) => assert_eq!(*n, 0),
+        _ => panic!("expected dictionary length = 0"),
+    }
+}
+
 
 
