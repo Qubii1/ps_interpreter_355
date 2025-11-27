@@ -388,6 +388,68 @@ impl Interpreter
                 Ok(true)
             }
 
+            "getinterval" =>
+            {
+                // Pop count
+                let count_val = self.pop()?;
+
+                // Make sure count is a valid integer
+                let count = match count_val
+                {
+                    Value::Int(i) => i,
+                    _ => return Err("getinterval expects integer count".into()),
+                };
+
+                // Throws error if count is negative
+                if count < 0
+                {
+                    return Err("getinterval count cannot be negative".into());
+                }
+
+                // Pop index
+                let index_val = self.pop()?;
+
+                // Make sure index is a valid integer
+                let index = match index_val
+                {
+                    Value::Int(i) => i,
+                    _ => return Err("getinterval expects integer index".into()),
+                };
+
+                // Throws error if index is negative
+                if index < 0
+                {
+                    return Err("getinterval index cannot be negative".into());
+                }
+
+                // Pop string
+                let string_val = self.pop()?;
+
+                // Makes sure string is valid
+                let string = match string_val
+                {
+                    Value::Str(string_to_check) => string_to_check,
+                    _ => return Err("getinterval expects string".into()),
+                };
+
+                let string_index = index as usize;
+                let character_count = count as usize;
+
+                // Bounds check
+                if string_index + character_count > string.len()
+                {
+                    return Err("getinterval range error".into());
+                }
+
+                // Extract substring
+                let substring = string[string_index..string_index + character_count].to_string();
+
+                // Push new string result
+                self.push(Value::Str(substring));
+
+                Ok(true)
+            }
+
             // Clears all the values in the stack
             "clear" =>
             {

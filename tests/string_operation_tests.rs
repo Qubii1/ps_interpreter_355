@@ -66,4 +66,33 @@ fn test_get_out_of_bounds()
     assert!(result.is_err(), "expected error for out-of-bounds index");
 }
 
+// Normal test case to ensure getinterval functionality is working
+#[test]
+fn test_getinterval_normal()
+{
+    let mut interp = Interpreter::new(ScopeMode::Dynamic);
+
+    interp.interpret("(hello) 1 3 getinterval").unwrap();
+
+    match interp.peek().unwrap()
+    {
+        Value::Str(s) => assert_eq!(s, "ell"),
+        _ => panic!("expected substring 'ell'"),
+    }
+}
+
+// Edge test case to ensure out of range string interval
+// throws error
+#[test]
+fn test_getinterval_range_error()
+{
+    let mut interp = Interpreter::new(ScopeMode::Dynamic);
+
+    // "hi" is length 2 → (hi) 1 5 getinterval is invalid
+    let result = interp.interpret("(hi) 1 5 getinterval");
+
+    assert!(result.is_err(), "expected range error for out-of-bounds substring");
+}
+
+
 
