@@ -221,6 +221,43 @@ impl Interpreter
                 Ok(true)
             }
 
+            "begin" =>
+            {
+                // Pop value from operand stack
+                let dict_val = self.pop()?;
+
+                // Ensure it is a dictionary
+                let new_dict = match dict_val 
+                {
+                    Value::Dict(d) => d,
+                    _ => return Err("begin expects a dictionary".into()),
+                };
+
+                // Push dictionary onto dictionary stack
+                let env_ref = self.dict.env(); // persistent dicitonary stack reference
+                let mut env: std::cell::RefMut<'_, Vec<std::collections::HashMap<String, Value>>> = env_ref.borrow_mut(); // borrow 
+                env.push(new_dict);
+
+                Ok(true)
+            }
+
+            "end" =>
+            {
+                // Borrow the environment stack safely
+                let env_ref = self.dict.env();
+                let mut env = env_ref.borrow_mut();
+
+                // You must not remove the bottom dictionary
+                if env.len() <= 1 
+                {
+                    return Err("end cannot pop bottom dictionary".into());
+                }
+
+                env.pop();
+                
+                Ok(true)
+            }
+
 
             "def" =>
             {

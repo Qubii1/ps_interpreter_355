@@ -166,3 +166,27 @@ fn test_exch_underflow()
     let result2 = interp.interpret("exch");
     assert!(result2.is_err(), "exch with zero values should error");
 }
+
+// Normal test case to ensure the clear function is working properly.
+#[test]
+fn test_clear_normal()
+{
+    let mut postscript_interpreter = Interpreter::new(ScopeMode::Dynamic);
+    postscript_interpreter.interpret("1 2 3 4").unwrap();
+
+    let mut stack = postscript_interpreter.opstack_snapshot();
+
+    assert_eq!(stack.len(), 4);
+
+    match (&stack[0], &stack[1], &stack[2], &stack[3])
+    {
+        (Value::Int(1), Value::Int(2), Value::Int(3), Value::Int(4)) => {},
+        _ => panic!("exch failed: expected [20, 10]"),
+    }
+
+    postscript_interpreter.interpret("clear").unwrap();
+
+    stack = postscript_interpreter.opstack_snapshot();
+
+    assert_eq!(stack.len(), 0);
+}
