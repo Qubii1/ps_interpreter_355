@@ -75,3 +75,46 @@ fn test_repeat()
 
     assert_eq!(i.len(), 3);
 }
+
+// Normal test case to ensure for functionality is working correctly
+#[test]
+fn test_for_normal()
+{
+    let mut i = Interpreter::new(ScopeMode::Dynamic);
+
+    i.interpret("1 1 3 { } for").unwrap();
+
+    assert_eq!(i.len(), 3); // loop ran 3 times
+}
+
+// Normal test case to ensure for functionality is working correctly
+#[test]
+fn test_for_values()
+{
+    let mut i = Interpreter::new(ScopeMode::Dynamic);
+
+    i.interpret("1 1 3 { } for").unwrap();
+
+    let stack = i.opstack_snapshot();
+    assert_eq!(stack.len(), 3);
+
+    match &stack[0]
+    {
+        Value::Int(1) => {}
+        _ => panic!("expected 1"),
+    }
+
+    match &stack[1]
+    {
+        Value::Int(2) => {}
+        _ => panic!("expected 2"),
+    }
+
+    match &stack[2]
+    {
+        Value::Int(3) => {}
+        _ => panic!("expected 3"),
+    }
+
+}
+

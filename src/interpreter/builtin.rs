@@ -764,6 +764,65 @@ impl Interpreter
                 Ok(true)
             }
 
+            "for" =>
+            {
+                let procedure_value = self.pop()?;
+                let limit_value = self.pop()?;
+                let increment_value = self.pop()?;
+                let initial_value = self.pop()?;
+
+                // Make sure procedure is valid
+                let procedure = match procedure_value
+                {
+                    Value::Procedure(body, captured) => (body, captured),
+                    _ => return Err("for expects procedure".into()),
+                };
+
+                // Makes sure initial value is valid integer
+                let initial = match initial_value
+                {
+                    Value::Int(i) => i,
+                    _ => return Err("for expects integer initial".into()),
+                };
+
+                // Makes sure increment value is valid
+                let increment = match increment_value
+                {
+                    Value::Int(i) if i != 0 => i,
+                    _ => return Err("for expects nonzero increment integer".into()),
+                };
+
+                // Makes sure limit value is valid integer
+                let limit = match limit_value
+                {
+                    Value::Int(i) => i,
+                    _ => return Err("for expects integer limit".into()),
+                };
+
+                let mut i = initial;
+                
+                if increment > 0
+                {
+                    while i <= limit
+                    {
+                        self.push(Value::Int(i));
+                        self.exec_tokens(&procedure.0, procedure.1.clone())?;
+                        i += increment;
+                    }
+                }
+                else
+                {
+                    while i >= limit
+                    {
+                        self.push(Value::Int(i));
+                        self.exec_tokens(&procedure.0, procedure.1.clone())?;
+                        i += increment;
+                    }
+                }
+
+                Ok(true)
+            }
+
             // Clears all the values in the stack
             "clear" =>
             {
