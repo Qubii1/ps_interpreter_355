@@ -736,6 +736,34 @@ impl Interpreter
                 Ok(true)
             }
 
+            "repeat" =>
+            {
+                let procedure_value = self.pop()?;
+                let count_value = self.pop()?;
+
+                // Make sure procedure is valid
+                let procedure = match procedure_value
+                {
+                    Value::Procedure(body, captured) => (body, captured),
+                    _ => return Err("repeat expects a procedure".into()),
+                };
+
+                // Make sure count is valid integer
+                let count = match count_value
+                {
+                    Value::Int(n) if n >= 0 => n,
+                    _ => return Err("repeat expects nonnegative integer".into()),
+                };
+
+                // Execute procedure until count is reached
+                for _ in 0..count
+                {
+                    self.exec_tokens(&procedure.0, procedure.1.clone())?;
+                }
+
+                Ok(true)
+            }
+
             // Clears all the values in the stack
             "clear" =>
             {

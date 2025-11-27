@@ -63,3 +63,15 @@ fn test_ifelse_false_branch()
         _ => panic!("expected 2"),
     }
 }
+
+// Normal test case to ensure repeat functionality is working correctly
+
+#[test]
+fn test_repeat()
+{
+    let mut i = Interpreter::new(ScopeMode::Dynamic);
+
+    i.interpret("3 { 10 } repeat").unwrap();
+
+    assert_eq!(i.len(), 3);
+}
