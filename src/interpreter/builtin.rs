@@ -332,7 +332,7 @@ impl Interpreter
                             let captured = Value::Procedure(body.clone(), Some(captured_env));
                             self.dict.define(&n, captured);
                         }
-                        // DYNAMIC: store the procedure as-is (no captured env)
+                        // DYNAMIC: store the procedure as is (no captured env)
                         _ =>
                         {
                             println!("DEBUG DEF: defining '{}' as {:?}", n, value);
